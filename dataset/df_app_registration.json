@@ -1,0 +1,35 @@
+{
+	"name": "df_app_registration",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AppRegistrationRestService",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"AppRegistrationUrl": {
+					"value": "@dataset().AppRegistrationUrl",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"AppRegistrationUrl": {
+				"type": "string"
+			},
+			"AppRegistrationPath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Test"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().AppRegistrationPath",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}
