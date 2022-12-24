@@ -1,5 +1,13 @@
 {
 	"name": "rappatoni-df",
+	"properties": {
+		"globalParameters": {
+			"cincinnati-mls-kv-base-url": {
+				"type": "string",
+				"value": "https://cincinnati-mls.vault.azure.net"
+			}
+		}
+	},
 	"location": "eastus",
 	"identity": {
 		"type": "SystemAssigned",
