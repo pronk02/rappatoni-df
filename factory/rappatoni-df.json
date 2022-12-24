@@ -1,0 +1,9 @@
+{
+	"name": "rappatoni-df",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "30247f4f-1401-4562-90cb-c0c150e2b738",
+		"tenantId": "5d7107c1-196b-42ab-82d1-d90bdbe3c34e"
+	}
+}

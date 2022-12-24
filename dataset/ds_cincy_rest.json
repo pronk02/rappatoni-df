@@ -1,0 +1,27 @@
+{
+	"name": "ds_cincy_rest",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "CincinnatiMLSRest",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"UrlPath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Rest"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().UrlPath",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

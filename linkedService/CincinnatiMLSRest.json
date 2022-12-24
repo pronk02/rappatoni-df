@@ -1,0 +1,12 @@
+{
+	"name": "CincinnatiMLSRest",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://retsapi.raprets.com/CIN/RESO/OData",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
