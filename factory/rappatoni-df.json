@@ -2,7 +2,7 @@
 	"name": "rappatoni-df",
 	"properties": {
 		"globalParameters": {
-			"cincinnati-mls-kv-base-url": {
+			"cincinnati_mls_kv_base_url": {
 				"type": "string",
 				"value": "https://cincinnati-mls.vault.azure.net"
 			}
