@@ -1,0 +1,23 @@
+{
+	"name": "AppRegistrationRestService",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://login.microsoftonline.com",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "OAuth2ClientCredential",
+			"clientId": "f61df473-ed3a-40fa-b718-e6e9b9cff679",
+			"clientSecret": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "CincinnatiMLSAzureKeyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "app-registratiion-cl-secret"
+			},
+			"tokenEndpoint": "https://login.microsoftonline.com/5d7107c1-196b-42ab-82d1-d90bdbe3c34e/oauth2/v2.0/token",
+			"scope": "api://f61df473-ed3a-40fa-b718-e6e9b9cff679/.default"
+		}
+	}
+}
