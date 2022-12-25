@@ -25,7 +25,77 @@
 				}
 			},
 			{
-				"name": "Get Cincy KV Secrets",
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set Variable Expiration",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"additionalHeaders": {
+								"value": "@{concat(\n    'Authorization: Bearer ',    \n    activity('Retrieve AAD Token - Post').output.access_token\n)}",
+								"type": "Expression"
+							},
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings",
+							"filePattern": "setOfObjects"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_http_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"HttpBaseUrl": {
+								"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets/bearer-token?api-version=7.3",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_rappatoni_data_lake",
+						"type": "DatasetReference",
+						"parameters": {
+							"DataLakeDirectory": "testdir",
+							"DataLakeFileName": "testfile2.json"
+						}
+					}
+				]
+			},
+			{
+				"name": "Get RappatoniToken from Keyvault",
 				"type": "WebActivity",
 				"dependsOn": [
 					{
@@ -45,19 +115,57 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets?api-version=7.3",
+						"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets/bearer-token?api-version=7.3",
 						"type": "Expression"
 					},
 					"method": "GET",
 					"headers": {
 						"Authorization": {
-							"value": "@concat(\n    'Bearer ',\n    activity('Retrieve AAD Token - Post').output.access_token\n)",
+							"value": "@{concat(\n    'Bearer ',    \n    activity('Retrieve AAD Token - Post').output.access_token\n)}",
 							"type": "Expression"
 						}
 					}
 				}
+			},
+			{
+				"name": "Set Variable Expiration",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get RappatoniToken from Keyvault",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ExpirationVar",
+					"value": {
+						"value": "@{convertTimeZone(\n    addSeconds(\n        '1970-01-01T00:00:00',\n        activity('Get RappatoniToken from Keyvault').output.attributes.exp\n    ),\n    'UTC',\n    'Eastern Standard Time'\n)}\n",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"KV_Secret_Names": {
+				"type": "Array",
+				"defaultValue": [
+					"client-id",
+					"client-secret"
+				]
+			},
+			"TrueVar": {
+				"type": "String"
+			},
+			"FalseVar": {
+				"type": "String"
+			},
+			"ExpirationVar": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Test"
 		},
