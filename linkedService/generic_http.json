@@ -1,0 +1,17 @@
+{
+	"name": "generic_http",
+	"properties": {
+		"parameters": {
+			"HttpBaseUrl": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "@{linkedService().HttpBaseUrl}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
