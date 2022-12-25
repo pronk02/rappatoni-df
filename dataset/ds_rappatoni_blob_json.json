@@ -1,0 +1,17 @@
+{
+	"name": "ds_rappatoni_blob_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "rappatonidf_blob_storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation"
+			}
+		},
+		"schema": {}
+	}
+}
