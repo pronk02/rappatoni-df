@@ -1,0 +1,14 @@
+{
+	"name": "Conversions",
+	"properties": {
+		"type": "UDFLibrary",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"convertUnixDateToEastern(long) as timestamp = toTimestamp(i1)"
+			]
+		}
+	}
+}
