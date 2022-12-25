@@ -2,14 +2,14 @@
 	"name": "ds_rappatoni_blob_json",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "rappatonidf_blob_storage",
+			"referenceName": "rappatoni_data_lake",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"BlobJsonDirectory": {
+			"DataLakeDirectory": {
 				"type": "String"
 			},
-			"BlobJsonFileName": {
+			"DataLakeFileName": {
 				"type": "String"
 			}
 		},
@@ -17,16 +17,12 @@
 		"type": "Json",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
-				"fileName": {
-					"value": "@dataset().BlobJsonFileName",
-					"type": "Expression"
-				},
+				"type": "AzureBlobFSLocation",
 				"folderPath": {
-					"value": "@dataset().BlobJsonDirectory",
+					"value": "@dataset().DataLakeDirectory",
 					"type": "Expression"
 				},
-				"container": "rappatoni-df"
+				"fileSystem": "rappatoni-df"
 			}
 		},
 		"schema": {}
