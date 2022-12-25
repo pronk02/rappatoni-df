@@ -1,0 +1,11 @@
+{
+	"name": "rappatonidf_blob_storage",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://rappatonistorageacct.blob.core.windows.net/",
+			"accountKind": "StorageV2"
+		}
+	}
+}
