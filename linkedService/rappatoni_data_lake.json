@@ -1,0 +1,10 @@
+{
+	"name": "rappatoni_data_lake",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://rappatonistorageacct.dfs.core.windows.net/"
+		}
+	}
+}
