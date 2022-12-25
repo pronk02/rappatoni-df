@@ -1,5 +1,5 @@
 {
-	"name": "ds_rappatoni_blob_json",
+	"name": "ds_rappatoni_data_lake",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "rappatoni_data_lake",
@@ -18,6 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().DataLakeFileName",
+					"type": "Expression"
+				},
 				"folderPath": {
 					"value": "@dataset().DataLakeDirectory",
 					"type": "Expression"
