@@ -1,13 +1,15 @@
 {
-	"name": "pl_password_grant",
+	"name": "pl_rappatoni_bearer_token",
 	"properties": {
+		"description": "The Rappatoni Bearer Token has a 60 day expiration, so this shouldn't need to be run often",
 		"activities": [
 			{
-				"name": "Post Request",
+				"name": "Retrieve Rappatoni Bearer Token",
+				"description": "",
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "Get Cincy KV Secrets",
+						"activity": "Keyvault Secret Retrieval",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -53,8 +55,8 @@
 				}
 			},
 			{
-				"name": "Get Cincy KV Secrets",
-				"type": "WebActivity",
+				"name": "Keyvault Secret Retrieval",
+				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "Retrieve AAD Token - Post",
@@ -63,29 +65,81 @@
 						]
 					}
 				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": {
-						"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets?api-version=7.3",
+					"items": {
+						"value": "@variables('KV_Secret_Names')",
 						"type": "Expression"
 					},
-					"method": "GET",
-					"headers": {
-						"Authorization": {
-							"value": "@concat(\n    'Bearer ',\n    activity('Retrieve AAD Token - Post').output.access_token\n)",
-							"type": "Expression"
+					"activities": [
+						{
+							"name": "Get Cincy KV Secrets",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets?api-version=7.3",
+									"type": "Expression"
+								},
+								"method": "GET",
+								"headers": {
+									"Authorization": {
+										"value": "@concat(\n    'Bearer ',\n    activity('Retrieve AAD Token - Post').output.access_token\n)",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Get Rappatoni Bearer Token",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets/bearer-token?api-version=7.3",
+									"type": "Expression"
+								},
+								"method": "GET",
+								"headers": {
+									"Authorization": {
+										"value": "@concat(\n    'Bearer ',\n    activity('Retrieve AAD Token - Post').output.access_token\n)",
+										"type": "Expression"
+									}
+								}
+							}
 						}
-					}
+					]
 				}
 			}
 		],
+		"variables": {
+			"KV_Secret_Names": {
+				"type": "Array",
+				"defaultValue": [
+					"client-id",
+					"client-secret",
+					"password",
+					"token-url",
+					"username"
+				]
+			}
+		},
 		"folder": {
 			"name": "Authorization"
 		},
