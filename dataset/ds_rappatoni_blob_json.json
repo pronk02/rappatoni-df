@@ -5,11 +5,28 @@
 			"referenceName": "rappatonidf_blob_storage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"BlobJsonDirectory": {
+				"type": "String"
+			},
+			"BlobJsonFileName": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation"
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().BlobJsonFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().BlobJsonDirectory",
+					"type": "Expression"
+				},
+				"container": "rappatoni-df"
 			}
 		},
 		"schema": {}
