@@ -3,9 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Retrieve AAD Token - Post",
-				"description": "\"clientId\": \"f61df473-ed3a-40fa-b718-e6e9b9cff679\",\n\"tokenEndpoint\": \"https://login.microsoftonline.com/5d7107c1-196b-42ab-82d1-d90bdbe3c34e/oauth2/v2.0/token\",\n\"scope\": \"api://f61df473-ed3a-40fa-b718-e6e9b9cff679/.default\"\n\nPOST /{tenant}/oauth2/v2.0/token\nContent-Type: application/x-www-form-urlencoded\n\nclient_id=f61df473-ed3a-40fa-b718-e6e9b9cff679\n&scope=api%3A%2F%2Ff61df473-ed3a-40fa-b718-e6e9b9cff679%2F.default\n&client_secret=CHn8Q~2ONJNbLdDzZDcLQeyHH1aY0dTb2mzXmadF\n&grant_type=client_credentials",
-				"type": "WebActivity",
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -16,67 +15,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://login.microsoftonline.com/5d7107c1-196b-42ab-82d1-d90bdbe3c34e/oauth2/v2.0/token",
-					"method": "POST",
-					"headers": {
-						"Content-Type": "application/x-www-form-urlencoded"
-					},
-					"body": "client_id=f61df473-ed3a-40fa-b718-e6e9b9cff679&scope=https%3A%2F%2Fvault.azure.net%2F.default&client_secret=CHn8Q~2ONJNbLdDzZDcLQeyHH1aY0dTb2mzXmadF&grant_type=client_credentials"
-				}
-			},
-			{
-				"name": "Get RappatoniToken from Keyvault",
-				"type": "WebActivity",
-				"dependsOn": [
-					{
-						"activity": "Retrieve AAD Token - Post",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"url": {
-						"value": "@{pipeline().globalParameters.cincinnati_mls_kv_base_url}//secrets/bearer-token?api-version=7.3",
-						"type": "Expression"
-					},
-					"method": "GET",
-					"headers": {
-						"Authorization": {
-							"value": "@{concat(\n    'Bearer ',    \n    activity('Retrieve AAD Token - Post').output.access_token\n)}",
-							"type": "Expression"
+					"dataflow": {
+						"referenceName": "df_member_replicate",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"UrlPath": "/Member?Class=Member"
+							}
 						}
-					}
-				}
-			},
-			{
-				"name": "Data flow1",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "Get RappatoniToken from Keyvault",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
