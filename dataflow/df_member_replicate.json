@@ -12,8 +12,29 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "CosmosDbNoSql",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          body as ({@odata.context} as string, {@odata.nextLink} as string, value as (AgentPictureCount as boolean, BirthDate as date, ContactAdditionalPhoneType1 as string, ContactAdditionalPhoneType2 as string, ContactAdditionalPhoneType3 as string, ContactPhoneAreaCode1 as short, ContactPhoneAreaCode2 as short, ContactPhoneAreaCode3 as short, ContactPhoneNumber1 as integer, ContactPhoneNumber2 as integer, ContactPhoneNumber3 as integer, ContactPhoneType1 as string, ContactPhoneType2 as string, ContactPhoneType3 as string, Gender as string, HomePhoneAreaCode as short, HomePhoneNumber as integer, LicenseExpirationDate as date, LicenseType as string, MemberCarrierRoute as string, MemberCity as string, MemberCountyOrParish as string, MemberEmail as string, MemberFax as string, MemberFirstName as string, MemberFullName as string, MemberHomePhone as string, MemberKeyNumeric as short, MemberLanguages as string, MemberLastName as string, MemberMiddleName as string, MemberMlsAccessYN as boolean, MemberMlsId as string, MemberMobilePhone as long, MemberNamePrefix as string, MemberNameSuffix as string, MemberNationalAssociationId as string, MemberNickname as string, MemberOfficePhoneExt as short, MemberPager as string, MemberPostalCode as string, MemberPostalCodePlus4 as string, MemberStateLicense as string, MemberStateOrProvince as string, ModemPhone as string, ModificationTimestamp as string, OfficeKeyNumeric as integer, OfficeMlsId as string, OfficeName as string, Other1Phone as long, Other2Phone as long, PersFaxPhone as long, PersonalFaxAreaCode as short, PersonalFaxPhone as integer, StreetAddress as string, TransferDate as date, VoiceMailPhone as long, WebPageAddress as string, {_2ndHomePhone} as long)[]),",
@@ -24,8 +45,87 @@
 				"     httpMethod: 'GET',",
 				"     timeout: 30,",
 				"     headers: ['Authorization' -> 'Bearer e1d82e9443044b9b89a57a685f952218'],",
-				"     paginationRules: ['supportRFC5988' -> 'true'],",
-				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1"
+				"     paginationRules: ['absoluteUrl' -> 'body.{@odata.nextLink}'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments'],",
+				"     preferredIntegralType: 'long') ~> source1",
+				"source1 foldDown(unroll(body.value, body.value),",
+				"     mapColumn(",
+				"          AgentPictureCount = body.value.AgentPictureCount,",
+				"          BirthDate = body.value.BirthDate,",
+				"          ContactAdditionalPhoneType1 = body.value.ContactAdditionalPhoneType1,",
+				"          ContactAdditionalPhoneType2 = body.value.ContactAdditionalPhoneType2,",
+				"          ContactAdditionalPhoneType3 = body.value.ContactAdditionalPhoneType3,",
+				"          ContactPhoneAreaCode1 = body.value.ContactPhoneAreaCode1,",
+				"          ContactPhoneAreaCode2 = body.value.ContactPhoneAreaCode2,",
+				"          ContactPhoneAreaCode3 = body.value.ContactPhoneAreaCode3,",
+				"          ContactPhoneNumber1 = body.value.ContactPhoneNumber1,",
+				"          ContactPhoneNumber2 = body.value.ContactPhoneNumber2,",
+				"          ContactPhoneNumber3 = body.value.ContactPhoneNumber3,",
+				"          ContactPhoneType1 = body.value.ContactPhoneType1,",
+				"          ContactPhoneType2 = body.value.ContactPhoneType2,",
+				"          ContactPhoneType3 = body.value.ContactPhoneType3,",
+				"          Gender = body.value.Gender,",
+				"          HomePhoneAreaCode = body.value.HomePhoneAreaCode,",
+				"          HomePhoneNumber = body.value.HomePhoneNumber,",
+				"          LicenseExpirationDate = body.value.LicenseExpirationDate,",
+				"          LicenseType = body.value.LicenseType,",
+				"          MemberCarrierRoute = body.value.MemberCarrierRoute,",
+				"          MemberCity = body.value.MemberCity,",
+				"          MemberCountyOrParish = body.value.MemberCountyOrParish,",
+				"          MemberEmail = body.value.MemberEmail,",
+				"          MemberFax = body.value.MemberFax,",
+				"          MemberFirstName = body.value.MemberFirstName,",
+				"          MemberFullName = body.value.MemberFullName,",
+				"          MemberHomePhone = body.value.MemberHomePhone,",
+				"          MemberKeyNumeric = body.value.MemberKeyNumeric,",
+				"          MemberLanguages = body.value.MemberLanguages,",
+				"          MemberLastName = body.value.MemberLastName,",
+				"          MemberMiddleName = body.value.MemberMiddleName,",
+				"          MemberMlsAccessYN = body.value.MemberMlsAccessYN,",
+				"          MemberMlsId = body.value.MemberMlsId,",
+				"          MemberMobilePhone = body.value.MemberMobilePhone,",
+				"          MemberNamePrefix = body.value.MemberNamePrefix,",
+				"          MemberNameSuffix = body.value.MemberNameSuffix,",
+				"          MemberNationalAssociationId = body.value.MemberNationalAssociationId,",
+				"          MemberNickname = body.value.MemberNickname,",
+				"          MemberOfficePhoneExt = body.value.MemberOfficePhoneExt,",
+				"          MemberPager = body.value.MemberPager,",
+				"          MemberPostalCode = body.value.MemberPostalCode,",
+				"          MemberPostalCodePlus4 = body.value.MemberPostalCodePlus4,",
+				"          MemberStateLicense = body.value.MemberStateLicense,",
+				"          MemberStateOrProvince = body.value.MemberStateOrProvince,",
+				"          ModemPhone = body.value.ModemPhone,",
+				"          ModificationTimestamp = body.value.ModificationTimestamp,",
+				"          OfficeKeyNumeric = body.value.OfficeKeyNumeric,",
+				"          OfficeMlsId = body.value.OfficeMlsId,",
+				"          OfficeName = body.value.OfficeName,",
+				"          Other1Phone = body.value.Other1Phone,",
+				"          Other2Phone = body.value.Other2Phone,",
+				"          PersFaxPhone = body.value.PersFaxPhone,",
+				"          PersonalFaxAreaCode = body.value.PersonalFaxAreaCode,",
+				"          PersonalFaxPhone = body.value.PersonalFaxPhone,",
+				"          StreetAddress = body.value.StreetAddress,",
+				"          TransferDate = body.value.TransferDate,",
+				"          VoiceMailPhone = body.value.VoiceMailPhone,",
+				"          WebPageAddress = body.value.WebPageAddress,",
+				"          {_2ndHomePhone} = body.value.{_2ndHomePhone}",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"filter1 alterRow(upsertIf(true())) ~> AlterRow1",
+				"flatten1 derive(id = MemberMlsId) ~> derivedColumn1",
+				"derivedColumn1 filter(id != '' && id != '999999' && !startsWith(id, 'Query') && !startsWith(id, 'Input')) ~> filter1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'document',",
+				"     container: 'Member',",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: true,",
+				"     store: 'cosmosDB',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
