@@ -1,0 +1,23 @@
+{
+	"name": "ds_cosmosdb",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "CosmosDbNoSql",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DbContainer": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {},
+		"typeProperties": {
+			"collectionName": {
+				"value": "@dataset().DbContainer",
+				"type": "Expression"
+			}
+		}
+	}
+}
