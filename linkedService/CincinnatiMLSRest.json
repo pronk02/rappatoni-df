@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://retsapi.raprets.com/CIN/RESO/OData",
+			"url": "https://retsapi.raprets.com",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
