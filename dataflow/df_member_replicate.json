@@ -1,0 +1,32 @@
+{
+	"name": "df_member_replicate",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_cincy_rest",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          body as ({@odata.context} as string, {@odata.nextLink} as string, value as (AgentPictureCount as boolean, BirthDate as date, ContactAdditionalPhoneType1 as string, ContactAdditionalPhoneType2 as string, ContactAdditionalPhoneType3 as string, ContactPhoneAreaCode1 as short, ContactPhoneAreaCode2 as short, ContactPhoneAreaCode3 as short, ContactPhoneNumber1 as integer, ContactPhoneNumber2 as integer, ContactPhoneNumber3 as integer, ContactPhoneType1 as string, ContactPhoneType2 as string, ContactPhoneType3 as string, Gender as string, HomePhoneAreaCode as short, HomePhoneNumber as integer, LicenseExpirationDate as date, LicenseType as string, MemberCarrierRoute as string, MemberCity as string, MemberCountyOrParish as string, MemberEmail as string, MemberFax as string, MemberFirstName as string, MemberFullName as string, MemberHomePhone as string, MemberKeyNumeric as short, MemberLanguages as string, MemberLastName as string, MemberMiddleName as string, MemberMlsAccessYN as boolean, MemberMlsId as string, MemberMobilePhone as long, MemberNamePrefix as string, MemberNameSuffix as string, MemberNationalAssociationId as string, MemberNickname as string, MemberOfficePhoneExt as short, MemberPager as string, MemberPostalCode as string, MemberPostalCodePlus4 as string, MemberStateLicense as string, MemberStateOrProvince as string, ModemPhone as string, ModificationTimestamp as string, OfficeKeyNumeric as integer, OfficeMlsId as string, OfficeName as string, Other1Phone as long, Other2Phone as long, PersFaxPhone as long, PersonalFaxAreaCode as short, PersonalFaxPhone as integer, StreetAddress as string, TransferDate as date, VoiceMailPhone as long, WebPageAddress as string, {_2ndHomePhone} as long)[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     httpMethod: 'GET',",
+				"     timeout: 30,",
+				"     headers: ['Authorization' -> 'Bearer e1d82e9443044b9b89a57a685f952218'],",
+				"     paginationRules: ['supportRFC5988' -> 'true'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1"
+			]
+		}
+	}
+}
