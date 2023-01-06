@@ -17,7 +17,7 @@
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": {
-				"value": "@dataset().UrlPath",
+				"value": "@concat(\n    '/CIN/RESO/OData',\n    dataset().UrlPath\n)",
 				"type": "Expression"
 			}
 		},
