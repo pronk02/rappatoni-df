@@ -107,10 +107,33 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set varBearerToken",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "If Token Expiration Before Now",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varBearerToken",
+					"value": {
+						"value": "@activity('Get RappatoniToken from Keyvault').output.value",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
 			"varBearerTokenExpiration": {
+				"type": "String"
+			},
+			"varBearerToken": {
 				"type": "String"
 			}
 		},
