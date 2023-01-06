@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "pl_test_authorization",
 	"properties": {
 		"activities": [
 			{
@@ -70,29 +70,47 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "ExpirationVar",
+					"variableName": "varBearerTokenExpiration",
 					"value": {
 						"value": "@{convertTimeZone(\n    addSeconds(\n        '1970-01-01T00:00:00',\n        activity('Get RappatoniToken from Keyvault').output.attributes.exp\n    ),\n    'UTC',\n    'Eastern Standard Time'\n)}\n",
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "If Token Expiration Before Now",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Set Variable Expiration",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@less(variables('varBearerTokenExpiration'), utcNow())",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Fail - Bearer Token Expired",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Rapattoni bearer token expired, refresh it.",
+								"errorCode": "900"
+							}
+						}
+					]
+				}
 			}
 		],
 		"variables": {
-			"KV_Secret_Names": {
-				"type": "Array",
-				"defaultValue": [
-					"client-id",
-					"client-secret"
-				]
-			},
-			"TrueVar": {
-				"type": "String"
-			},
-			"FalseVar": {
-				"type": "String"
-			},
-			"ExpirationVar": {
+			"varBearerTokenExpiration": {
 				"type": "String"
 			}
 		},
