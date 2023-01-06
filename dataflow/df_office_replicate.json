@@ -1,0 +1,117 @@
+{
+	"name": "df_office_replicate",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "CincinnatiMLSRest",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "CosmosDbNoSql",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          body as ({@odata.context} as string, {@odata.nextLink} as string, value as (BillingOffice as integer, FaxAreaCode as short, FaxPhone as integer, IDXOfficeParticipationYN as boolean, IsActiveintheMLS as boolean, MailAddress as string, MailCareOf as string, MailCarrierRouteCode as string, MailCity as string, MailCounty as string, MailState as string, MailZipCode as string, MailZipPlus4 as string, MainOfficeKeyNumeric as integer, ModificationTimestamp as string, NumberOfBranches as short, OfficeAddress1 as string, OfficeAreaCode as short, OfficeBranchType as string, OfficeBrokerKeyNumeric as integer, OfficeCity as string, OfficeCorporateLicense as string, OfficeCountyOrParish as string, OfficeEmail as string, OfficeFax as string, OfficeKeyNumeric as integer, OfficeLongName as string, OfficeManagerKeyNumeric as integer, OfficeMlsId as string, OfficeName as string, OfficeNationalAssociationId as string, OfficePhone as string, OfficePhoneNumber as string, OfficePostalCode as string, OfficePostalCodePlus4 as short, OfficeStateOrProvince as string, OtherAreaCode as short, OtherPhoneNumber as integer, StreetCareOf as string, StreetCarrierRouteCode as string, WebPageAddress as string)[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'rest',",
+				"     timeout: 30,",
+				"     entity: '/CIN/RESO/odata/Office?Class=Office',",
+				"     headers: ['Authorization' -> 'Bearer e1d82e9443044b9b89a57a685f952218'],",
+				"     httpMethod: 'GET',",
+				"     paginationRules: ['absoluteUrl' -> 'body.{@odata.nextLink}'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine'],",
+				"     preferredIntegralType: 'long') ~> source1",
+				"source1 foldDown(unroll(body.value, body.value),",
+				"     mapColumn(",
+				"          BillingOffice = body.value.BillingOffice,",
+				"          FaxAreaCode = body.value.FaxAreaCode,",
+				"          FaxPhone = body.value.FaxPhone,",
+				"          IDXOfficeParticipationYN = body.value.IDXOfficeParticipationYN,",
+				"          IsActiveintheMLS = body.value.IsActiveintheMLS,",
+				"          MailAddress = body.value.MailAddress,",
+				"          MailCareOf = body.value.MailCareOf,",
+				"          MailCarrierRouteCode = body.value.MailCarrierRouteCode,",
+				"          MailCity = body.value.MailCity,",
+				"          MailCounty = body.value.MailCounty,",
+				"          MailState = body.value.MailState,",
+				"          MailZipCode = body.value.MailZipCode,",
+				"          MailZipPlus4 = body.value.MailZipPlus4,",
+				"          MainOfficeKeyNumeric = body.value.MainOfficeKeyNumeric,",
+				"          ModificationTimestamp = body.value.ModificationTimestamp,",
+				"          NumberOfBranches = body.value.NumberOfBranches,",
+				"          OfficeAddress1 = body.value.OfficeAddress1,",
+				"          OfficeAreaCode = body.value.OfficeAreaCode,",
+				"          OfficeBranchType = body.value.OfficeBranchType,",
+				"          OfficeBrokerKeyNumeric = body.value.OfficeBrokerKeyNumeric,",
+				"          OfficeCity = body.value.OfficeCity,",
+				"          OfficeCorporateLicense = body.value.OfficeCorporateLicense,",
+				"          OfficeCountyOrParish = body.value.OfficeCountyOrParish,",
+				"          OfficeEmail = body.value.OfficeEmail,",
+				"          OfficeFax = body.value.OfficeFax,",
+				"          OfficeKeyNumeric = body.value.OfficeKeyNumeric,",
+				"          OfficeLongName = body.value.OfficeLongName,",
+				"          OfficeManagerKeyNumeric = body.value.OfficeManagerKeyNumeric,",
+				"          OfficeMlsId = body.value.OfficeMlsId,",
+				"          OfficeName = body.value.OfficeName,",
+				"          OfficeNationalAssociationId = body.value.OfficeNationalAssociationId,",
+				"          OfficePhone = body.value.OfficePhone,",
+				"          OfficePhoneNumber = body.value.OfficePhoneNumber,",
+				"          OfficePostalCode = body.value.OfficePostalCode,",
+				"          OfficePostalCodePlus4 = body.value.OfficePostalCodePlus4,",
+				"          OfficeStateOrProvince = body.value.OfficeStateOrProvince,",
+				"          OtherAreaCode = body.value.OtherAreaCode,",
+				"          OtherPhoneNumber = body.value.OtherPhoneNumber,",
+				"          StreetCareOf = body.value.StreetCareOf,",
+				"          StreetCarrierRouteCode = body.value.StreetCarrierRouteCode,",
+				"          WebPageAddress = body.value.WebPageAddress",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"filter1 alterRow(upsertIf(true())) ~> AlterRow1",
+				"flatten1 derive(id = OfficeMlsId,",
+				"          each(match(true()), $$ = toString($$))) ~> derivedColumn1",
+				"derivedColumn1 filter(id != '' && id != '999999' && !startsWith(id, 'Query') && !startsWith(id, 'Input')) ~> filter1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'document',",
+				"     container: 'Member',",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: true,",
+				"     store: 'cosmosDB',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
