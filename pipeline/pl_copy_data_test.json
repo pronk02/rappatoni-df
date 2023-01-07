@@ -51,10 +51,7 @@
 								"referenceName": "rappatoni_data_lake",
 								"type": "LinkedServiceReference"
 							},
-							"path": {
-								"value": "@concat(\n    'rappatoni-df/logs/Copy Data Error ',\n    pipeline().RunId,\n    '.log'\n)",
-								"type": "Expression"
-							}
+							"path": "rappatoni-df/logs/"
 						}
 					}
 				},
