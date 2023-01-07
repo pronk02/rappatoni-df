@@ -20,7 +20,7 @@
 						"additionalColumns": [
 							{
 								"name": "id",
-								"value": "$$COLUMN:$.value[0].MemberMlsId"
+								"value": ""
 							}
 						],
 						"httpRequestTimeout": "00:01:40",
