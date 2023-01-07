@@ -35,6 +35,7 @@
 					},
 					"sink": {
 						"type": "CosmosDbSqlApiSink",
+						"writeBatchSize": 5000,
 						"writeBehavior": "upsert",
 						"disableMetricsCollection": false
 					},
