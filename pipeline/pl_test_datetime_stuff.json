@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbSqlApiSource",
-						"query": "SELECT top 1 c.ModificationTimestamp FROM c order by c.ModificationTimestamp desc",
+						"query": "SELECT top 1 c.ModificationTimestamp MaxModifiedDate FROM c order by c.ModificationTimestamp desc",
 						"preferredRegions": [],
 						"detectDatetime": false
 					},
@@ -29,8 +29,33 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "varFormatDateTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FormatDateTime",
+					"value": {
+						"value": "@string(\n    formatDateTime(\n        activity('Lookup1').output.firstRow.MaxModifiedDate,\n        'yyyy-MM-ddTHH:mm:sszzz'    \n    )\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"FormatDateTime": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Test"
 		},
