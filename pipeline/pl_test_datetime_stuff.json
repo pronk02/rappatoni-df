@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbSqlApiSource",
-						"query": "SELECT top 1 c.ModificationTimestamp MaxModifiedDate FROM c order by c.ModificationTimestamp desc",
+						"query": "SELECT top 1 c.id, c.ModificationTimestamp MaxModifiedDate FROM c order by c.ModificationTimestamp desc",
 						"preferredRegions": [],
 						"detectDatetime": false
 					},
@@ -45,7 +45,27 @@
 				"typeProperties": {
 					"variableName": "FormatDateTime",
 					"value": {
-						"value": "@string(\n    formatDateTime(\n        activity('Lookup1').output.firstRow.MaxModifiedDate,\n        'yyyy-MM-ddTHH:mm:sszzz'    \n    )\n)",
+						"value": "@formatDateTime(\n    activity('Lookup1').output.firstRow.MaxModifiedDate,\n    'yyyy-MM-ddTHH:mm:ss:fffffffK'\n)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "varFormatDateTime2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "varFormatDateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FormatDateTime2",
+					"value": {
+						"value": "@convertTimeZone(\n    activity('Lookup1').output.firstRow.MaxModifiedDate,\n    'utc',\n    'Eastern Standard Time'\n)",
 						"type": "Expression"
 					}
 				}
@@ -53,6 +73,9 @@
 		],
 		"variables": {
 			"FormatDateTime": {
+				"type": "String"
+			},
+			"FormatDateTime2": {
 				"type": "String"
 			}
 		},
