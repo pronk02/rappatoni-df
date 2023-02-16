@@ -17,12 +17,7 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "df_member_replicate",
-						"type": "DataFlowReference",
-						"datasetParameters": {
-							"source1": {
-								"UrlPath": "/Member?Class=Member"
-							}
-						}
+						"type": "DataFlowReference"
 					},
 					"compute": {
 						"coreCount": 8,
