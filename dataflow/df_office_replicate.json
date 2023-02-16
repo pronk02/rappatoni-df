@@ -30,12 +30,6 @@
 					"name": "AlterRow1"
 				},
 				{
-					"name": "derivedColumn1"
-				},
-				{
-					"name": "filter1"
-				},
-				{
 					"name": "select1"
 				}
 			],
@@ -85,10 +79,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
-				"filter1 alterRow(upsertIf(true())) ~> AlterRow1",
-				"select1 derive(id = OfficeMlsId,",
-				"          each(match(true()), $$ = toString($$))) ~> derivedColumn1",
-				"derivedColumn1 filter(derivedColumn1@id != '' && derivedColumn1@id != '999999' && !startsWith(derivedColumn1@id, 'Query') && !startsWith(derivedColumn1@id, 'Input')) ~> filter1",
+				"select1 alterRow(upsertIf(true())) ~> AlterRow1",
 				"flatten1 select(mapColumn(",
 				"          {odata.id} = {@odata.id},",
 				"          id = OfficeKey,",
@@ -99,9 +90,9 @@
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'document',",
-				"     container: 'Member',",
+				"     container: 'Office',",
 				"     deletable: false,",
-				"     insertable: true,",
+				"     insertable: false,",
 				"     updateable: false,",
 				"     upsertable: true,",
 				"     store: 'cosmosDB',",
