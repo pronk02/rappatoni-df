@@ -1,19 +1,13 @@
 {
 	"name": "CincinnatiMLSRest",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://www.perchwell.com/api/v1/OData/cincymls/",
+			"url": "https://www.perchwell.com",
 			"enableServerCertificateValidation": true,
-			"authenticationType": "Anonymous",
-			"authHeaders": {
-				"Authorization": {
-					"type": "SecureString",
-					"value": "**********"
-				}
-			}
+			"authenticationType": "Anonymous"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
