@@ -1,0 +1,105 @@
+{
+	"name": "df_property_replicate",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "CincinnatiMLSRest",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1",
+					"description": "{@odata.nextLink}"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "CosmosDbNoSql",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          body as ({@odata.context} as string, {@odata.nextLink} as string, value as ({@odata.context} as string, {@odata.id} as string, MemberCity as string, MemberEmail as string, MemberFirstName as string, MemberFullName as string, MemberKey as integer, MemberKeyNumeric as integer, MemberLastName as string, MemberMiddleName as string, MemberMlsAccessYN as boolean, MemberMlsId as string, MemberMobilePhone as long, MemberNamePrefix as string, MemberNationalAssociationId as string, MemberNickname as string, MemberOfficePhoneExt as short, MemberPassword as string, MemberPostalCode as string, MemberStateLicense as string, MemberStateOrProvince as string, ModificationTimestamp as string, OfficeKey as integer, OfficeKeyNumeric as integer, OfficeMlsId as string, OfficeName as string, OriginalEntryTimestamp as string, OriginatingSystemID as string)[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'rest',",
+				"     timeout: 30,",
+				"     entity: '/api/v1/OData/cincymls/Property',",
+				"     httpMethod: 'GET',",
+				"     paginationRules: ['absoluteUrl' -> 'body.{@odata.nextLink}'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine'],",
+				"     preferredIntegralType: 'long') ~> source1",
+				"source1 foldDown(unroll(body.value, body.value),",
+				"     mapColumn(",
+				"          {@odata.context} = body.value.{@odata.context},",
+				"          {@odata.id} = body.value.{@odata.id},",
+				"          MemberCity = body.value.MemberCity,",
+				"          MemberEmail = body.value.MemberEmail,",
+				"          MemberFirstName = body.value.MemberFirstName,",
+				"          MemberFullName = body.value.MemberFullName,",
+				"          MemberKey = body.value.MemberKey,",
+				"          MemberKeyNumeric = body.value.MemberKeyNumeric,",
+				"          MemberLastName = body.value.MemberLastName,",
+				"          MemberMiddleName = body.value.MemberMiddleName,",
+				"          MemberMlsAccessYN = body.value.MemberMlsAccessYN,",
+				"          MemberMlsId = body.value.MemberMlsId,",
+				"          MemberMobilePhone = body.value.MemberMobilePhone,",
+				"          MemberNamePrefix = body.value.MemberNamePrefix,",
+				"          MemberNationalAssociationId = body.value.MemberNationalAssociationId,",
+				"          MemberNickname = body.value.MemberNickname,",
+				"          MemberOfficePhoneExt = body.value.MemberOfficePhoneExt,",
+				"          MemberPassword = body.value.MemberPassword,",
+				"          MemberPostalCode = body.value.MemberPostalCode,",
+				"          MemberStateLicense = body.value.MemberStateLicense,",
+				"          MemberStateOrProvince = body.value.MemberStateOrProvince,",
+				"          ModificationTimestamp = body.value.ModificationTimestamp,",
+				"          OfficeKey = body.value.OfficeKey,",
+				"          OfficeKeyNumeric = body.value.OfficeKeyNumeric,",
+				"          OfficeMlsId = body.value.OfficeMlsId,",
+				"          OfficeName = body.value.OfficeName,",
+				"          OriginalEntryTimestamp = body.value.OriginalEntryTimestamp,",
+				"          OriginatingSystemID = body.value.OriginatingSystemID",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"select1 alterRow(upsertIf(true())) ~> AlterRow1",
+				"flatten1 select(mapColumn(",
+				"          {odata.id} = {@odata.id},",
+				"          id = MemberKey,",
+				"          each(match(!in(['@odata.id','MemberKey'],name)))",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'document',",
+				"     container: 'Member',",
+				"     deletable: false,",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     upsertable: true,",
+				"     store: 'cosmosDB',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
