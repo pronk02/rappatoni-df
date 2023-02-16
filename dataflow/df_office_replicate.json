@@ -31,6 +31,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -79,7 +82,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
-				"select1 alterRow(upsertIf(true())) ~> AlterRow1",
+				"derivedColumn1 alterRow(upsertIf(true())) ~> AlterRow1",
 				"flatten1 select(mapColumn(",
 				"          {odata.id},",
 				"          id = OfficeKey,",
@@ -88,6 +91,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(each(match(type != 'boolean'), $$ = toString($$))) ~> derivedColumn1",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'document',",
