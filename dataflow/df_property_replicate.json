@@ -34,6 +34,9 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
@@ -48,7 +51,6 @@
 				"     timeout: 30,",
 				"     entity: '/api/v1/OData/cincymls/Property?$filter=CloseDate%20ge%202022-10-01',",
 				"     httpMethod: 'GET',",
-				"     paginationRules: ['absoluteUrl' -> 'body.{@odata.nextLink}'],",
 				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine'],",
 				"     preferredIntegralType: 'long') ~> source1",
 				"source1 foldDown(unroll(body.value, body.value),",
@@ -209,7 +211,7 @@
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
 				"derivedColumn1 alterRow(upsertIf(true())) ~> AlterRow1",
-				"flatten1 select(mapColumn(",
+				"select2 select(mapColumn(",
 				"          {odata.id} = {@odata.id},",
 				"          id = ListingKey,",
 				"          each(match(!in(['@odata.id','ListingKey'],name)))",
@@ -217,6 +219,12 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
 				"select1 derive(each(match(typeMatch(type,'number')), $$ = toString($$))) ~> derivedColumn1",
+				"flatten1 select(mapColumn(",
+				"          each(match(/* All input columns */ true()),",
+				"               /* Input name */ $$ = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'document',",
