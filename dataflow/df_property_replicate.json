@@ -87,7 +87,7 @@
 				"flatten1 select(mapColumn(",
 				"          {odata.id} = {@odata.id},",
 				"          id = MemberKey,",
-				"          each(match(!in(['@odata.id','MemberKey'],name)))",
+				"          each(match(!in(['@odata.id','PropertyKey'],name)))",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
