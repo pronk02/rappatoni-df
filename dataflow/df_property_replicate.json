@@ -31,6 +31,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -42,7 +45,7 @@
 				"     validateSchema: false,",
 				"     format: 'rest',",
 				"     timeout: 30,",
-				"     entity: '/api/v1/OData/cincymls/Property',",
+				"     entity: '/api/v1/OData/cincymls/Property$top=5&$filter',",
 				"     httpMethod: 'GET',",
 				"     paginationRules: ['absoluteUrl' -> 'body.{@odata.nextLink}'],",
 				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine'],",
@@ -80,7 +83,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
-				"select1 alterRow(upsertIf(true())) ~> AlterRow1",
+				"derivedColumn1 alterRow(upsertIf(true())) ~> AlterRow1",
 				"flatten1 select(mapColumn(",
 				"          {odata.id} = {@odata.id},",
 				"          id = MemberKey,",
@@ -88,6 +91,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(each(match(type != 'boolean'), $$ = toString($$))) ~> derivedColumn1",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'document',",
