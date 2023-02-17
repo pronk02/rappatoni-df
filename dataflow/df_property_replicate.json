@@ -219,7 +219,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"ConvertPriceFieldsToInt derive(each(match(typeMatch(type, 'number') || typeMatch(type, 'datetime')), $$ = toString($$))) ~> ConvertNumberFieldsToString",
+				"ConvertPriceFieldsToInt derive(each(match(true()), $$ = toString($$))) ~> ConvertNumberFieldsToString",
 				"select1 derive(each(match(in(['ClosePrice', 'ListPrice', 'OriginalListPrice'],name)), $$ = toInteger($$))) ~> ConvertPriceFieldsToInt",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
