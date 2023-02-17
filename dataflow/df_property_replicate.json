@@ -43,6 +43,7 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     limit: 100,",
 				"     format: 'rest',",
 				"     timeout: 30,",
 				"     entity: '/api/v1/OData/cincymls/Property?$filter=CloseDate%20ge%202022-10-01',",
