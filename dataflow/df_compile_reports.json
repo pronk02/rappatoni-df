@@ -12,6 +12,10 @@
 					"name": "property"
 				},
 				{
+					"dataset": {
+						"referenceName": "ds_cosmosdb",
+						"type": "DatasetReference"
+					},
 					"name": "member"
 				},
 				{
@@ -20,9 +24,17 @@
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "ds_mls_blob_storage",
+						"type": "DatasetReference"
+					},
 					"name": "bycounty"
 				},
 				{
+					"dataset": {
+						"referenceName": "ds_mls_blob_storage",
+						"type": "DatasetReference"
+					},
 					"name": "allcounties"
 				}
 			],
@@ -69,26 +81,21 @@
 			],
 			"scriptLines": [
 				"parameters{",
-				"     NewConstruction as boolean,",
-				"     MlsRegion as string ('mibor')",
+				"     NewConstruction as boolean",
 				"}",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     inferDriftedColumnTypes: true,",
-				"     format: 'document',",
+				"     container: 'Property',",
+				"     format: 'documentQuery',",
+				"     query: 'SELECT\\n    c.id as p_key,\\n    c.CountyOrParish as p_county,\\n    c.ListAgentKey as p_listagentkey,\\n    c.BuyerAgentKey as p_sellingagentkey,\\n    c.ClosePrice as p_closeprice,\\n    c.NewConstructionYN as newconst,\\n    c.CloseDate\\nFROM c\\nWHERE c.CloseDate BETWEEN \"2022-10-01\" AND \"2022-12-31\"  ',",
 				"     store: 'cosmosDB') ~> property",
-				"source(output(",
-				"          m_agentemail as string,",
-				"          m_agentname as string,",
-				"          m_agentphone as string,",
-				"          m_key as string,",
-				"          m_membermlsid as string,",
-				"          m_officekey as string,",
-				"          m_officemlsid as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
+				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     inferDriftedColumnTypes: true) ~> member",
+				"     inferDriftedColumnTypes: true,",
+				"     query: 'SELECT\\n    c.id as m_key,\\n    c.MemberMlsId as m_membermlsid,\\n    c.MemberFullName as m_agentname,\\n    c.OfficeKey as m_officekey,\\n    c.OfficeMlsId as m_officemlsid,\\n    c.MemberMobilePhone as m_agentphone,\\n    c.MemberEmail as m_agentemail\\nFROM c\\nWHERE LOWER(c.MemberStatus) = \\'active\\'',",
+				"     format: 'documentQuery',",
+				"     systemColumns: false) ~> member",
 				"source(output(",
 				"          o_key as string,",
 				"          o_officemlsid as string,",
@@ -197,8 +204,8 @@
 				"     validateSchema: false,",
 				"     partitionFileNames:[(iif(\r",
 				"    $NewConstruction == true(),\r",
-				"    'MIBOR by County New Const.csv',\r",
-				"    'MIBOR by County.csv'\r",
+				"    'Cincinnati by County New Const.csv',\r",
+				"    'Cincinnati by County.csv'\r",
 				")\r",
 				")],",
 				"     skipDuplicateMapInputs: true,",
@@ -208,8 +215,8 @@
 				"     validateSchema: false,",
 				"     partitionFileNames:[(iif(    \r",
 				"    $NewConstruction == true(),    \r",
-				"    'MIBOR All Counties New Const.csv',    \r",
-				"    'MIBOR All Counties.csv'\r",
+				"    'Cincinnati All Counties New Const.csv',    \r",
+				"    'Cincinnati All Counties.csv'\r",
 				"))],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
