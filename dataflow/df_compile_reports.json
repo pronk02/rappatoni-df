@@ -1,0 +1,220 @@
+{
+	"name": "df_compile_reports",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "CosmosDbNoSql",
+						"type": "LinkedServiceReference"
+					},
+					"name": "property"
+				},
+				{
+					"name": "member"
+				},
+				{
+					"name": "office"
+				}
+			],
+			"sinks": [
+				{
+					"name": "bycounty"
+				},
+				{
+					"name": "allcounties"
+				}
+			],
+			"transformations": [
+				{
+					"name": "joinwithproperty"
+				},
+				{
+					"name": "runcalculations"
+				},
+				{
+					"name": "selectneededcolumns"
+				},
+				{
+					"name": "sumlistedandsold"
+				},
+				{
+					"name": "finalselectandrename"
+				},
+				{
+					"name": "sortbytotaldesc"
+				},
+				{
+					"name": "filternewconst"
+				},
+				{
+					"name": "runcalculationsbycounty"
+				},
+				{
+					"name": "sumlistedandsoldbycounty"
+				},
+				{
+					"name": "finalselectandrenamebycounty"
+				},
+				{
+					"name": "sortbytotaldescbycounty"
+				},
+				{
+					"name": "joinmemberandoffice"
+				},
+				{
+					"name": "selectagentfields"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     NewConstruction as boolean,",
+				"     MlsRegion as string ('mibor')",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     format: 'document',",
+				"     store: 'cosmosDB') ~> property",
+				"source(output(",
+				"          m_agentemail as string,",
+				"          m_agentname as string,",
+				"          m_agentphone as string,",
+				"          m_key as string,",
+				"          m_membermlsid as string,",
+				"          m_officekey as string,",
+				"          m_officemlsid as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true) ~> member",
+				"source(output(",
+				"          o_key as string,",
+				"          o_officemlsid as string,",
+				"          o_officename as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true) ~> office",
+				"property, selectagentfields join(or(m_key==p_listagentkey, m_key == p_sellingagentkey),",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinwithproperty",
+				"selectneededcolumns aggregate(groupBy(agentid,",
+				"          agentname,",
+				"          officename,",
+				"          agentphone,",
+				"          agentemail),",
+				"     Listed = countIf(agentid==p_listagentid),",
+				"          Sold = countIf(agentid==p_sellingagentid),",
+				"          {Listed Avg} = round(avgIf(agentid==p_listagentid, toInteger(p_closeprice))),",
+				"          {Sold Avg} = round(avgIf(agentid==p_sellingagentid, toInteger(p_closeprice)))) ~> runcalculations",
+				"filternewconst select(mapColumn(",
+				"          p_county,",
+				"          agentid = m_key,",
+				"          agentname = m_agentname,",
+				"          officename = o_officename,",
+				"          agentphone = m_agentphone,",
+				"          agentemail = m_agentemail,",
+				"          p_listagentid = p_listagentkey,",
+				"          p_sellingagentid = p_sellingagentkey,",
+				"          p_closeprice",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectneededcolumns",
+				"runcalculations derive(Total = Listed+Sold) ~> sumlistedandsold",
+				"sumlistedandsold select(mapColumn(",
+				"          {Agent Name} = agentname,",
+				"          {Office Name} = officename,",
+				"          {Agent Phone} = agentphone,",
+				"          {Agent Email} = agentemail,",
+				"          {Listed #} = Listed,",
+				"          {Sold #} = Sold,",
+				"          {Listed Avg $} = {Listed Avg},",
+				"          {Sold Avg $} = {Sold Avg},",
+				"          {Total #} = Total",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> finalselectandrename",
+				"finalselectandrename sort(desc({Total #}, false),",
+				"     partitionBy('hash', 1)) ~> sortbytotaldesc",
+				"joinwithproperty filter(case(\r",
+				"    $NewConstruction == true(), \r",
+				"    newconst == true(), \r",
+				"    isNull(p_key) == false()\r",
+				")) ~> filternewconst",
+				"selectneededcolumns aggregate(groupBy(p_county,",
+				"          agentid,",
+				"          agentname,",
+				"          officename,",
+				"          agentphone,",
+				"          agentemail),",
+				"     Listed = countIf(agentid==p_listagentid),",
+				"          Sold = countIf(agentid==p_sellingagentid),",
+				"          {Listed Avg} = round(avgIf(agentid==p_listagentid, toInteger(p_closeprice))),",
+				"          {Sold Avg} = round(avgIf(agentid==p_sellingagentid, toInteger(p_closeprice)))) ~> runcalculationsbycounty",
+				"runcalculationsbycounty derive(Total = Listed+Sold) ~> sumlistedandsoldbycounty",
+				"sumlistedandsoldbycounty select(mapColumn(",
+				"          County = p_county,",
+				"          {Agent Name} = agentname,",
+				"          {Office Name} = officename,",
+				"          {Agent Phone} = agentphone,",
+				"          {Agent Email} = agentemail,",
+				"          {Listed #} = Listed,",
+				"          {Sold #} = Sold,",
+				"          {Listed Avg $} = {Listed Avg},",
+				"          {Sold Avg $} = {Sold Avg},",
+				"          {Total #} = Total",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> finalselectandrenamebycounty",
+				"finalselectandrenamebycounty sort(asc(County, false),",
+				"     desc({Total #}, false),",
+				"     caseInsensitive: true,",
+				"     partitionBy('hash', 1)) ~> sortbytotaldescbycounty",
+				"member, office join(m_officekey == o_key,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinmemberandoffice",
+				"joinmemberandoffice select(mapColumn(",
+				"          m_agentemail,",
+				"          m_agentname,",
+				"          m_agentphone,",
+				"          m_key,",
+				"          m_membermlsid,",
+				"          m_officekey,",
+				"          m_officemlsid,",
+				"          o_key,",
+				"          o_officemlsid,",
+				"          o_officename",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectagentfields",
+				"sortbytotaldescbycounty sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[(iif(\r",
+				"    $NewConstruction == true(),\r",
+				"    'MIBOR by County New Const.csv',\r",
+				"    'MIBOR by County.csv'\r",
+				")\r",
+				")],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> bycounty",
+				"sortbytotaldesc sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[(iif(    \r",
+				"    $NewConstruction == true(),    \r",
+				"    'MIBOR All Counties New Const.csv',    \r",
+				"    'MIBOR All Counties.csv'\r",
+				"))],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> allcounties"
+			]
+		}
+	}
+}
